@@ -10,13 +10,16 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Limpeza de Espaço (Maximizando Disco)
+      - name: Limpeza Extrema de Espaço
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/local/stack
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/lib/node_modules
           docker image prune --all --force
 
       - name: Instalando Ferramentas de Compilação
@@ -29,21 +32,23 @@ jobs:
           git config --global user.email "luisfelipe@exemplo.com"
           git config --global user.name "Luis Felipe"
 
-      - name: Inicializando Código do KairoOS (AOSP)
+      - name: Inicializando Código do KairoOS (AOSP Minimalista)
         run: |
           mkdir build && cd build
-          repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r1 --depth=1
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          # Adicionado filtros para remover arquiteturas desnecessárias e economizar espaço
+          repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Personalizando para KairoOS
         run: |
           echo "Dando identidade ao sistema..."
-          # Aqui futuramente adicionaremos os scripts para mudar logos e nomes internos
+          # Aqui poderemos adicionar comandos de 'sed' para mudar nomes em arquivos de sistema
 
       - name: Compilando o Sistema
         run: |
           cd build
           source build/envsetup.sh
+          # Usando 'aosp_arm64-eng' para gerar uma imagem genérica de teste
           lunch aosp_arm64-eng
           m -j$(nproc --all)
 
