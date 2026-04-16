@@ -34,16 +34,21 @@ jobs:
       - name: Inicializando Código (KairoOS Android 11)
         run: |
           mkdir build && cd build
-          # Mudamos para o branch 'android-11.0.0_r1' que é muito mais leve
+          # Branch Android 11: Mais leve e estável para o GitHub
           repo init -u https://android.googlesource.com/platform/manifest -b android-11.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
           repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
 
-      - name: Compilando o KairoOS
+      - name: Compilando o KairoOS (Com Correção de OpenGL)
         run: |
           cd build
+          # Removendo o módulo que causa o erro "undefined module cuttlefish_host_only"
+          rm -rf device/generic/opengl-transport
+          
           source build/envsetup.sh
-          # Usando aosp_arm64-eng para compatibilidade
+          # Configurando para 64 bits genérico
           lunch aosp_arm64-eng
+          
+          # Compilando em modo econômico (-j2) para não estourar a RAM
           m -j2
 
       - name: Salvando Resultado
