@@ -1,4 +1,4 @@
-name: KairoOS Build System
+name: KairoOS Build System (Stable Edition)
 
 on:
   workflow_dispatch:
@@ -10,16 +10,11 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Limpeza e Preparação de Memória
+      - name: Limpeza Extrema e Swap
         run: |
-          # Desativa o swap se ele já estiver rodando para não dar "Text file busy"
           sudo swapoff -a || true
-          
-          # Limpeza profunda
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" /usr/lib/jvm /usr/local/stack /usr/local/share/powershell /usr/local/lib/node_modules
           docker image prune --all --force
-          
-          # Cria o Swap apenas se não houver erro
           sudo rm -f /swapfile
           sudo fallocate -l 4G /swapfile
           sudo chmod 600 /swapfile
@@ -36,19 +31,19 @@ jobs:
           git config --global user.email "luisfelipe@exemplo.com"
           git config --global user.name "Luis Felipe"
 
-      - name: Inicializando Código (Foco em Espaço)
+      - name: Inicializando Código (KairoOS Android 11)
         run: |
           mkdir build && cd build
-          # Reduzi um pouco para 4G de swap para sobrar mais espaço em disco para os arquivos
-          repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
-          repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+          # Mudamos para o branch 'android-11.0.0_r1' que é muito mais leve
+          repo init -u https://android.googlesource.com/platform/manifest -b android-11.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
+          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
 
       - name: Compilando o KairoOS
         run: |
           cd build
           source build/envsetup.sh
+          # Usando aosp_arm64-eng para compatibilidade
           lunch aosp_arm64-eng
-          # Usando -j2 para manter a estabilidade da memória
           m -j2
 
       - name: Salvando Resultado
