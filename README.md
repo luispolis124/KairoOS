@@ -1,47 +1,29 @@
 # 📱 KairoOS
 
-[PT-BR] O **KairoOS** é um sistema operacional móvel baseado no **AOSP**, idealizado e desenvolvido por **Luis Felipe**.
-[EN] **KairoOS** is a mobile operating system based on **AOSP**, conceptualized and developed by **Luis Felipe**.
+[PT-BR] O **KairoOS** é um sistema operacional móvel baseado no **AOSP**, desenvolvido por **Luis Felipe**.
+[EN] **KairoOS** is a mobile operating system based on **AOSP**, developed by **Luis Felipe**.
 
 ---
 
-## 🚀 Sobre o Projeto / About the Project
+## 🚀 Sobre / About
 
-**[PT-BR]**
-O KairoOS busca refletir a filosofia de design do **Luis Felipe**. O foco está na estabilidade, leveza e em uma estética que remeta à nostalgia das tecnologias analógicas e retro.
-* **Base:** Android 11 (AOSP)
-* **Objetivo:** Criar um ambiente móvel fluido e criativo.
+**[PT-BR]** Baseado no Android 11, o KairoOS foca em estabilidade, fluidez e em uma identidade visual autoral.
+**[EN]** Based on Android 11, KairoOS focuses on stability, fluidity, and an original visual identity.
 
-**[EN]**
-KairoOS aims to reflect the design philosophy of **Luis Felipe**. The focus is on stability, lightness, and an aesthetic that evokes the nostalgia of analog and retro technologies.
-* **Base:** Android 11 (AOSP)
-* **Goal:** Create a fluid and creative mobile environment.
+## 🛠️ Status & Objetivos / Status & Goals
 
----
+**[PT-BR]** * **Fase Alpha:** Compilando `systemimage` para o **Moto G9 Play**.
+* **Personalização:** Desenvolvimento de Boot Animation exclusivo e interface customizada.
+* **Foco:** Experiência de usuário única e design original.
 
-## 🛠️ Status do Desenvolvimento / Development Status
+**[EN]** * **Alpha Phase:** Compiling `systemimage` for **Moto G9 Play**.
+* **Customization:** Developing an exclusive Boot Animation and custom interface.
+* **Focus:** Unique user experience and original design.
 
-**[PT-BR]**
-Atualmente em fase de **Build Inicial (Alpha)**. Trabalhando na compilação do `systemimage` para dispositivos como o **Moto G9 Play**.
-
-**[EN]**
-Currently in **Initial Build (Alpha)** phase. Working on the `systemimage` compilation for devices like the **Moto G9 Play**.
-
-### ✅ Próximos Passos / Next Steps:
-- [ ] Concluir a compilação via GitHub Actions / Finish build via GitHub Actions.
-- [ ] Boot Animation (estilo VHS/Retro) / Custom VHS/Retro Boot Animation.
-- [ ] Identidade visual 8-bit / 8-bit visual identity.
-- [ ] Teste em hardware real / Real hardware testing.
-
----
-
-## ✒️ Licença e Créditos / License and Credits
-
-**[PT-BR]** Iniciativa pessoal de **Luis Felipe**.
-**[EN]** Personal initiative by **Luis Felipe**.
+## ✒️ Créditos / Credits
 
 * **YouTube:** [@luisfelipovi5022](https://www.youtube.com/@luisfelipovi5022)
 * **Xbox/Minecraft:** `luisfelipovi`
 
 ---
-*Developed with dedication by Luis Felipe in Bueno Brandão, MG, Brazil.*
+*Developed by Luis Felipe - Bueno Brandão, MG, Brazil.*
