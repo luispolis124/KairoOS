@@ -1,0 +1,54 @@
+name: KairoOS Build System
+
+on:
+  workflow_dispatch: # Permite que você inicie a compilação manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Limpeza de Espaço (Maximizando Disco)
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf /usr/lib/jvm
+          docker image prune --all --force
+
+      - name: Instalando Ferramentas de Compilação
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc build-essential zip curl libstdc++6 git python3 python3-pip python-is-python3 repo
+
+      - name: Configurando o Git
+        run: |
+          git config --global user.email "luisfelipe@exemplo.com"
+          git config --global user.name "Luis Felipe"
+
+      - name: Inicializando Código do KairoOS (AOSP)
+        run: |
+          mkdir build && cd build
+          repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r1 --depth=1
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+      - name: Personalizando para KairoOS
+        run: |
+          echo "Dando identidade ao sistema..."
+          # Aqui futuramente adicionaremos os scripts para mudar logos e nomes internos
+
+      - name: Compilando o Sistema
+        run: |
+          cd build
+          source build/envsetup.sh
+          lunch aosp_arm64-eng
+          m -j$(nproc --all)
+
+      - name: Salvando Resultado (Artefato)
+        uses: actions/upload-artifact@v4
+        with:
+          name: KairoOS-Image
+          path: build/out/target/product/*/system.img
