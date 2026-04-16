@@ -13,7 +13,7 @@ O KairoOS busca refletir a filosofia de design do **Luis Felipe**. O foco está 
 * **Objetivo:** Criar um ambiente móvel fluido e criativo.
 
 **[EN]**
-KairoOS aims to reflect the design philosophy of **Luis Felipe Produções**. The focus is on stability, lightness, and an aesthetic that evokes the nostalgia of analog and retro technologies.
+KairoOS aims to reflect the design philosophy of **Luis Felipe**. The focus is on stability, lightness, and an aesthetic that evokes the nostalgia of analog and retro technologies.
 * **Base:** Android 11 (AOSP)
 * **Goal:** Create a fluid and creative mobile environment.
 
