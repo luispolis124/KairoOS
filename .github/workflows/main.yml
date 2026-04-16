@@ -38,18 +38,19 @@ jobs:
           repo init -u https://android.googlesource.com/platform/manifest -b android-11.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
           repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
 
-      - name: Compilando o KairoOS (Com Correção de OpenGL)
+      - name: Compilando o KairoOS (Limpeza de Dependências)
         run: |
           cd build
-          # Removendo o módulo que causa o erro "undefined module cuttlefish_host_only"
+          # Removendo módulos de emulação (Cuttlefish e OpenGL Transport) que causam erros de arquivos ausentes
+          rm -rf device/google/cuttlefish
           rm -rf device/generic/opengl-transport
           
           source build/envsetup.sh
-          # Configurando para 64 bits genérico
+          # Usando o alvo genérico de 64 bits
           lunch aosp_arm64-eng
           
-          # Compilando em modo econômico (-j2) para não estourar a RAM
-          m -j2
+          # Focando apenas na geração da imagem do sistema (systemimage) para evitar erros de kernel de emulador
+          m -j2 systemimage
 
       - name: Salvando Resultado
         uses: actions/upload-artifact@v4
