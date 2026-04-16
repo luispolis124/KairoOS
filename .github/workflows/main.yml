@@ -10,18 +10,23 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Limpeza Extrema e Aumento de Memória (Swap)
+      - name: Limpeza e Preparação de Memória
         run: |
-          # Limpeza total para ganhar espaço
+          # Desativa o swap se ele já estiver rodando para não dar "Text file busy"
+          sudo swapoff -a || true
+          
+          # Limpeza profunda
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" /usr/lib/jvm /usr/local/stack /usr/local/share/powershell /usr/local/lib/node_modules
           docker image prune --all --force
-          # Criando 8GB de memória Swap para o Soong não dar crash
-          sudo fallocate -l 8G /swapfile
+          
+          # Cria o Swap apenas se não houver erro
+          sudo rm -f /swapfile
+          sudo fallocate -l 4G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
 
-      - name: Instalando Ferramentas de Compilação
+      - name: Instalando Ferramentas
         run: |
           sudo apt-get update
           sudo apt-get install -y bc build-essential zip curl libstdc++6 git python3 python3-pip python-is-python3 repo
@@ -31,27 +36,23 @@ jobs:
           git config --global user.email "luisfelipe@exemplo.com"
           git config --global user.name "Luis Felipe"
 
-      - name: Inicializando Código do KairoOS (AOSP Minimalista)
+      - name: Inicializando Código (Foco em Espaço)
         run: |
           mkdir build && cd build
+          # Reduzi um pouco para 4G de swap para sobrar mais espaço em disco para os arquivos
           repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
           repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
-      - name: Personalizando para KairoOS
-        run: |
-          echo "Dando identidade ao sistema..."
-
-      - name: Compilando o Sistema (Modo Econômico)
+      - name: Compilando o KairoOS
         run: |
           cd build
           source build/envsetup.sh
           lunch aosp_arm64-eng
-          # Usando apenas 2 núcleos (-j2) para economizar RAM e evitar o erro de Bootstrap
+          # Usando -j2 para manter a estabilidade da memória
           m -j2
 
-      - name: Salvando Resultado (Artefato)
+      - name: Salvando Resultado
         uses: actions/upload-artifact@v4
         with:
           name: KairoOS-Image
           path: build/out/target/product/*/system.img
-
