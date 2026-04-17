@@ -6,51 +6,77 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 360
+
     steps:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Limpeza Extrema e Swap
+      - name: Limpeza Extrema + Swap Otimizado
         run: |
           sudo swapoff -a || true
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" /usr/lib/jvm /usr/local/stack /usr/local/share/powershell /usr/local/lib/node_modules
-          docker image prune --all --force
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/boost /usr/lib/jvm /usr/local/stack \
+            /usr/local/share/powershell /usr/local/lib/node_modules
+          docker image prune --all --force || true
+
+          # Swap maior (importante!)
           sudo rm -f /swapfile
-          sudo fallocate -l 4G /swapfile
+          sudo fallocate -l 8G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
+          free -h
 
-      - name: Instalando Ferramentas e Bibliotecas Legadas
+      - name: Instalar Dependências (Android 11)
         run: |
           sudo apt-get update
-          # Adicionamos libncurses5 e libncurses5:i386 para o Clang antigo funcionar
-          sudo apt-get install -y bc build-essential zip curl libstdc++6 git python3 python3-pip python-is-python3 repo libncurses5
+          sudo apt-get install -y \
+            bc bison build-essential curl flex g++-multilib gcc-multilib git gnupg gperf \
+            libncurses5 libssl-dev libxml2-utils lzop zip unzip zlib1g-dev \
+            openjdk-8-jdk python-is-python3 repo rsync
 
-      - name: Configurando o Git
+      - name: Configurar Java 8 Global
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> $GITHUB_ENV
+          echo "PATH=/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH" >> $GITHUB_ENV
+          java -version
+
+      - name: Configurar Git
         run: |
           git config --global user.email "luisfelipe@exemplo.com"
           git config --global user.name "Luis Felipe"
 
-      - name: Inicializando Código (KairoOS Android 11)
+      - name: Inicializar AOSP (mais estável)
         run: |
-          mkdir build && cd build
-          repo init -u https://android.googlesource.com/platform/manifest -b android-11.0.0_r1 --depth=1 --groups=all,-notdefault,-device,-mips,-x86
-          repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
+          mkdir -p build
+          cd build
+          repo init -u https://android.googlesource.com/platform/manifest \
+            -b android-11.0.0_r1 --depth=1
+          repo sync -c -j2 --force-sync --no-clone-bundle --no-tags
 
-      - name: Compilando o KairoOS (Limpeza de Dependências)
+      - name: Cache de build (melhora MUITO)
+        uses: actions/cache@v4
+        with:
+          path: build/out
+          key: kairoos-build-${{ github.run_id }}
+          restore-keys: |
+            kairoos-build-
+
+      - name: Compilar KairoOS (modo seguro)
         run: |
           cd build
-          rm -rf device/google/cuttlefish
-          rm -rf device/generic/opengl-transport
-          
           source build/envsetup.sh
           lunch aosp_arm64-eng
-          
-          # Agora com a libncurses5 instalada, o Clang deve rodar liso
-          m -j2 systemimage
 
-      - name: Salvando Resultado
+          # Build mais seguro pra evitar crash
+          m -j1 systemimage
+
+      - name: Verificar saída
+        run: |
+          ls -lh build/out/target/product/*/ || true
+
+      - name: Salvar Resultado
         uses: actions/upload-artifact@v4
         with:
           name: KairoOS-Image
