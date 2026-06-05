@@ -70,14 +70,14 @@ jobs:
           lunch aosp_arm64-eng
 
           # Build mais seguro pra evitar crash
-          m -j1 systemimage
+          m -j1 systemimage bootimage
 
       - name: Verificar saída
         run: |
-          ls -lh build/out/target/product/*/ || true
+          ls -lh build/out/target/product/*/* || true
 
       - name: Salvar Resultado
         uses: actions/upload-artifact@v4
         with:
           name: KairoOS-Image
-          path: build/out/target/product/*/system.img
+          path: build/out/target/product/**/system.img
